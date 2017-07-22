@@ -1,0 +1,15 @@
+{
+  "name": "fda",
+  "version": "0.0.0",
+  "description": "fantasy football draft assistant",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Nick Makes",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "csvtojson": "1.1.7",
+    "mongodb": "^2.2.30"
+  }
+}
