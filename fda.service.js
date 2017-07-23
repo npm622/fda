@@ -1,73 +1,82 @@
 const csv = require( 'csvtojson' ),
-  MongoClient = require( 'mongodb' ).MongoClient;
+  PlayersService = require( './players.service.js' ).PlayersService;
 
-const RAW_PROJECTIONS = 'ffa_rawprojections2017-0.csv';
-const CUSTOM_RANKINGS = 'ffa_customrankings2017-0.csv';
+function FdaService( database ) {
+  'use strict';
 
-MongoClient.connect( 'mongodb://localhost:27017/fda', function( err, db ) {
-  const playerMap = {};
+  const _this = this;
 
-  csv()
-    .fromFile( RAW_PROJECTIONS )
-    .on( 'json', ( o ) => {
-      playerMap[ o.playerId ] = {
-        _id: o.playerId,
-        name: o.player,
-        team: o.team,
-        pos: o.position,
-        projections: parseProjections( o )
-      };
-    } )
-    .on( 'done', ( error ) => {
-      csv()
-        .fromFile( CUSTOM_RANKINGS )
-        .on( 'json', ( o ) => {
-          const player = playerMap[ o.playerId ];
+  const playersService = new PlayersService( database );
 
-          if ( !player ) {
-            console.log( 'failed to find existing player in map:' );
-            console.log( o );
-            process.exit();
-          }
+  _this.importPlayersFromFfa = function( rawProjectionsCsv, customRankingsCsv, clean ) {
+    if ( clean ) {
+      // TODO: delete all from players collection
+      console.log( 'mocking collection drop here' );
+    }
 
-          player.age = parseIntSafely( o.age );
-          player.exp = parseIntSafely( o.exp );
-          player.bye = parseIntSafely( o.bye );
-          player.risk = parseFloatSafely( o.risk );
-          player.ranks = parseRanks( o );
-          player.ecr = parseEcr( o );
-          player.pts = parsePts( o );
-          player.vor = parseVor( o );
-        } )
-        .on( 'done', ( error ) => {
-          const playerIds = [];
-          for ( const playerId in playerMap ) {
-            if ( playerMap.hasOwnProperty( playerId ) ) {
-              playerIds.push( playerId );
-            }
-          }
+    parseCsv( rawProjectionsCsv )
+      .then( ( rs ) => {
+        const playerMap = {};
+        rs.forEach( o => playerMap[ o.playerId ] = {
+          _id: o.playerId,
+          name: o.player,
+          team: o.team,
+          pos: o.position,
+          projections: parseProjections( o )
+        } );
 
-          for ( let i = 0; i < playerIds.length; i++ ) {
-            const player = playerMap[ playerIds[ i ] ];
+        parseCsv( customRankingsCsv )
+          .then( ( rs ) => {
+            rs.forEach( ( o ) => {
+              const player = playerMap[ o.playerId ];
 
-            db.collection( 'players' ).update( {
-              _id: player._id
-            }, player, {
-              upsert: true
-            }, function( err, count, status ) {
-              if ( i === playerIds.length - 1 ) {
-                console.log( count );
-                console.log( status );
-
-                console.log( 'upserted ' + count + ' players.' );
-
+              if ( !player ) {
+                console.log( 'failed to find existing player in map:' );
+                console.log( o );
                 process.exit();
               }
+
+              player.age = parseIntSafely( o.age );
+              player.exp = parseIntSafely( o.exp );
+              player.bye = parseIntSafely( o.bye );
+              player.risk = parseFloatSafely( o.risk );
+              player.ranks = parseRanks( o );
+              player.ecr = parseEcr( o );
+              player.pts = parsePts( o );
+              player.vor = parseVor( o );
             } );
-          }
-        } );
-    } );
-} );
+
+            const players = Object.keys( playerMap )
+              .filter( ( playerId ) => playerMap.hasOwnProperty( playerId ) )
+              .map( ( playerId ) => playerMap[ playerId ] );
+
+            playersService.upsertMany( players ).then( ( response ) => {
+              console.log( 'upserted ' + players.length + ' players.' );
+            } ).catch( ( error ) => {
+              console.log( 'failed to upsert players into database: ' + error );
+            } ).finally( () => process.exit() );
+          } )
+          .catch( ( err ) => console.log( 'encountered error parsing custom rankings [ ' + customRankingsCsv + ' ]; err: ' + err ) );
+      } )
+      .catch( ( err ) => console.log( 'encountered error parsing raw projections [ ' + rawProjectionsCsv + ' ]; err: ' + err ) );
+  }
+}
+
+function parseCsv( file ) {
+  const rs = [];
+
+  return new Promise( ( resolve, reject ) => {
+    csv()
+      .fromFile( file )
+      .on( 'json', ( o ) => rs.push( o ) )
+      .on( 'done', ( error ) => {
+        if ( error ) {
+          reject( error );
+        }
+        resolve( rs );
+      } );
+  } );
+}
 
 function parseIntSafely( val ) {
   const num = parseInt( val );
@@ -201,3 +210,5 @@ function parseVor( o ) {
     }
   };
 }
+
+module.exports.FdaService = FdaService;
