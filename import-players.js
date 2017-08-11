@@ -1,51 +1,51 @@
-const csv = require( 'csvtojson' ),
-  PlayersService = require( './players.service.js' ).PlayersService,
-  TeamsService = require( './teams.service.js' ).TeamsService;
+const commander = require( 'commander' ),
+  csv = require( 'csvtojson' ),
+  MongoClient = require( 'mongodb' ).MongoClient,
+  PlayerService = require( './services/player' ).PlayerService;
 
-function FdaService( database ) {
-  'use strict';
+const program = commander
+  .version( '0.0.0' )
+  .option( '-r, --raw-projections [filename]', 'Specify the raw projections .csv file [ffa_rawprojections.csv]', './data/ffa_rawprojections.csv' )
+  .option( '-c, --custom-rankings [filename]', 'Specify the custom rankings .csv file [ffa_customrankings.csv]', './data/ffa_customrankings.csv' )
+  .option( '-h, --host [hostname]', 'Specify the mongod hostname [localhost]', 'localhost' )
+  .option( '-p, --port [port]', 'Specify the mongod port [27017]', parseInt, 27017 )
+  .option( '-d, --db [db]', 'Specify the mongod db name [fda]', 'fda' )
+  .parse( process.argv );
 
-  const _this = this;
+const mongoServiceUrl = connectionUrl( program.host, program.port, program.db )
+MongoClient.connect( mongoServiceUrl, ( err, db ) => {
 
-  const playersService = new PlayersService( database );
-  const teamsService = new TeamsService( database );
-
-  _this.importTeam = function( teamId, teamName ) {
-    teamsService.upsertOne( {
-        _id: teamId,
-        name: teamName
-      } )
-      .then( ( response ) => console.log( 'successfully imported team [ ' + teamName + ' ]' ) )
-      .catch( ( error ) => console.log( 'encountered error inserting team [ ' + teamName + ' ]; err: ' + err ) )
-      .finally( () => process.exit() );
+  if ( err ) {
+    console.log( 'failed to connect to mongodb: ' + JSON.stringify( err ) );
+    process.exit();
   }
 
-  _this.importPlayersFromFfa = function( rawProjectionsCsv, customRankingsCsv, clean ) {
-    if ( clean ) {
-      // TODO: delete all from players collection
-      console.log( 'mocking collection drop here' );
-    }
+  const playerService = new PlayerService( db );
 
-    parseCsv( rawProjectionsCsv )
-      .then( ( rs ) => {
-        const playerMap = {};
-        rs.forEach( o => playerMap[ o.playerId ] = {
-          _id: o.playerId,
-          name: o.player,
-          team: o.team,
-          pos: o.position,
-          projections: parseProjections( o )
+  const playerMap = {};
+
+  try {
+    parseCsv( program.rawProjections )
+      .then( rs => {
+
+        rs.forEach( o => {
+          playerMap[ o.playerId ] = {
+            _id: o.playerId,
+            name: o.player,
+            team: o.team,
+            pos: o.position,
+            projections: parseProjections( o )
+          }
         } );
 
-        parseCsv( customRankingsCsv )
-          .then( ( rs ) => {
-            rs.forEach( ( o ) => {
+        parseCsv( program.customRankings )
+          .then( rs => {
+
+            rs.forEach( o => {
               const player = playerMap[ o.playerId ];
 
               if ( !player ) {
-                console.log( 'failed to find existing player in map:' );
-                console.log( o );
-                process.exit();
+                throw new Error( 'failed to find existing player in map: ' + o.playerId );
               }
 
               player.age = parseIntSafely( o.age );
@@ -62,16 +62,28 @@ function FdaService( database ) {
               .filter( ( playerId ) => playerMap.hasOwnProperty( playerId ) )
               .map( ( playerId ) => playerMap[ playerId ] );
 
-            playersService.upsertMany( players ).then( ( response ) => {
-              console.log( 'upserted ' + players.length + ' players.' );
-            } ).catch( ( error ) => {
-              console.log( 'failed to upsert players into database: ' + error );
-            } ).finally( () => process.exit() );
+            playerService.upsertBatch( players )
+              .then( response => console.log( 'successfully bulk upserted players: ' + JSON.stringify( response ) ) )
+              .catch( error => console.log( 'failed bulk players upsert: ' + JSON.stringify( error ) ) )
+              .finally( () => db.close() );
+
           } )
-          .catch( ( err ) => console.log( 'encountered error parsing custom rankings [ ' + customRankingsCsv + ' ]; err: ' + err ) );
+          .catch( err => {
+            console.log( 'failed to read custom rankings: ' + JSON.stringify( err ) ) ;
+            db.close();
+          } )
       } )
-      .catch( ( err ) => console.log( 'encountered error parsing raw projections [ ' + rawProjectionsCsv + ' ]; err: ' + err ) );
+      .catch( err => {
+        console.log( 'failed to read raw projections: ' + JSON.stringify( err ) );
+        db.close();
+      } )
+  } catch ( e ) {
+    console.log( 'failed player import: ' + JSON.stringify( e ) );
   }
+} );
+
+function connectionUrl( host, port, db ) {
+  return 'mongodb://' + host + ':' + port + '/' + db;
 }
 
 function parseCsv( file ) {
@@ -80,10 +92,10 @@ function parseCsv( file ) {
   return new Promise( ( resolve, reject ) => {
     csv()
       .fromFile( file )
-      .on( 'json', ( o ) => rs.push( o ) )
-      .on( 'done', ( error ) => {
-        if ( error ) {
-          reject( error );
+      .on( 'json', o => rs.push( o ) )
+      .on( 'done', e => {
+        if ( e ) {
+          reject( e );
         }
         resolve( rs );
       } );
@@ -222,5 +234,3 @@ function parseVor( o ) {
     }
   };
 }
-
-module.exports.FdaService = FdaService;
