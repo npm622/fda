@@ -9,7 +9,10 @@
   "author": "Nick Makes",
   "license": "UNLICENSED",
   "dependencies": {
+    "bluebird": "^3.5.0",
+    "commander": "^2.11.0",
     "csvtojson": "1.1.7",
+    "inquirer": "^3.2.0",
     "mongodb": "^2.2.30"
   }
 }
