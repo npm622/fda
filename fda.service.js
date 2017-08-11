@@ -1,5 +1,6 @@
 const csv = require( 'csvtojson' ),
-  PlayersService = require( './players.service.js' ).PlayersService;
+  PlayersService = require( './players.service.js' ).PlayersService,
+  TeamsService = require( './teams.service.js' ).TeamsService;
 
 function FdaService( database ) {
   'use strict';
@@ -7,6 +8,17 @@ function FdaService( database ) {
   const _this = this;
 
   const playersService = new PlayersService( database );
+  const teamsService = new TeamsService( database );
+
+  _this.importTeam = function( teamId, teamName ) {
+    teamsService.upsertOne( {
+        _id: teamId,
+        name: teamName
+      } )
+      .then( ( response ) => console.log( 'successfully imported team [ ' + teamName + ' ]' ) )
+      .catch( ( error ) => console.log( 'encountered error inserting team [ ' + teamName + ' ]; err: ' + err ) )
+      .finally( () => process.exit() );
+  }
 
   _this.importPlayersFromFfa = function( rawProjectionsCsv, customRankingsCsv, clean ) {
     if ( clean ) {
