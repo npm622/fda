@@ -26,7 +26,7 @@ MongoClient.connect( mongoServiceUrl, ( err, db ) => {
   teamService.findAllForLeague( program.leagueId )
     .then( teams => {
 
-      const serviceCalls = teams.map( team => teamService.delete( team._id ) );
+      const serviceCalls = teams.map( team => teamService.delete( program.leagueId, team.manager ) );
       serviceCalls.push( leagueService.delete( program.leagueId ) );
 
       Promise.all( serviceCalls )

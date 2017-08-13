@@ -1,4 +1,5 @@
-const Promise = require( 'bluebird' );
+const Promise = require( 'bluebird' ),
+  ObjectID = require( 'mongodb' ).ObjectID;
 
 const COLLECTION_NAME = 'teams';
 
@@ -8,6 +9,28 @@ function TeamService( database ) {
   var _this = this;
 
   _this.coll = database.collection( COLLECTION_NAME );
+
+  _this.findOneForLeagueManager = ( leagueId, manager ) => {
+    console.log( 'finding team: { ' + 'leagueId: ' + leagueId + ', ' + 'manager: ' + manager + ' }' );
+
+    const query = {
+      leagueId: leagueId,
+      manager: manager
+    }
+
+    return new Promise( ( resolve, reject ) => {
+      _this.coll.findOne( query, ( err, team ) => {
+
+        if ( err ) {
+          console.log( 'error occurred while finding team: { ' + 'leagueId: ' + leagueId + ', ' + 'manager: ' + manager + ' }...' );
+          console.log( 'err: ' + JSON.stringify( err ) );
+          reject( err );
+        }
+
+        resolve( team );
+      } );
+    } );
+  }
 
   _this.findAllForLeague = leagueId => {
     console.log( 'finding teams for league id: ' + leagueId );
@@ -34,12 +57,13 @@ function TeamService( database ) {
     console.log( 'upserting team: ' + JSON.stringify( team ) );
 
     const query = {
-      _id: team._id
-    }
+      leagueId: team.leagueId,
+      manager: team.manager
+    };
 
     const options = {
       upsert: true
-    }
+    };
 
     return new Promise( ( resolve, reject ) => {
       _this.coll.update( query, team, options, ( err, res ) => {
@@ -56,11 +80,12 @@ function TeamService( database ) {
     } );
   };
 
-  _this.delete = teamId => {
-    console.log( 'deleting team: ' + teamId );
+  _this.delete = ( leagueId, manager ) => {
+    console.log( 'deleting team: { ' + 'leagueId: ' + leagueId + ', ' + 'manager: ' + manager + " }" );
 
     const query = {
-      _id: teamId
+      leagueId: leagueId,
+      manager: manager
     }
 
     const options = {
@@ -71,7 +96,7 @@ function TeamService( database ) {
       _this.coll.remove( query, options, ( err, res ) => {
 
         if ( err ) {
-          console.log( 'error occured while deleting team [ ' + teamId + ' ]...' );
+          console.log( 'error occured while deleting team [ ' + manager + ' ]...' );
           console.log( 'err: ' + JSON.stringify( err ) );
           reject( err );
         }
@@ -82,4 +107,4 @@ function TeamService( database ) {
   };
 }
 
-module.exports.TeamService = TeamService;
+module.exports.TeamService = TeamService;;
