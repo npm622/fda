@@ -1,27 +1,21 @@
-import db from "../db";
-import errors from "./errors";
+import errors from '../util/errors';
+import { LeagueService } from '../service';
 
 const findAll = ( request, response ) => {
-  const query = {};
-  const cursor = db.leagues().find( query );
-
-  cursor.toArray()
+  LeagueService.findAll()
     .then( leagues => response.status( 200 ).json( leagues ) )
     .catch( error => errors.responseHandler( response, error.stack, `failed to get leagues: ${error.message}` ) );
-}
+};
 
 const findById = ( request, response ) => {
   const leagueId = request.params.id;
 
-  const query = { _id: leagueId };
-  const cursor = db.leagues().find( query ).limit( 1 );
-
-  cursor.next()
+  LeagueService.findById( leagueId )
     .then( league => response.status( 200 ).json( league ) )
     .catch( error => errors.responseHandler( response, error.stack, `failed to find league [ ${leagueId} ]: ${error.message}` ) );
-}
+};
 
-const put = ( request, response ) => {
+const upsert = ( request, response ) => {
   const leagueId = request.params.id;
   const league = request.body;
 
@@ -32,39 +26,62 @@ const put = ( request, response ) => {
   if ( leagueId !== league._id ) {
     errors.responseHandler( response, 'id mismatch between path variable and supplied document', 'invalid inputs: id mismatch' );
   } else {
-    const filter = { _id: leagueId };
-    const options = { upsert: true };
-
-    db.leagues().updateOne( filter, league, options )
+    LeagueService.upsert( league )
       .then( result => response.status( 200 ).json( result ) ) // update: { "n": 1, "nModified": 1, "ok": 1 }; insert: { "n": 1, "nModified": 0, "upserted": [ { "index": 0, "_id": "chiphi_2017" } ], "ok": 1 }
       .catch( error => errors.responseHandler( response, error.stack, `failed to upsert league [ ${leagueId} ]: ${error.message}` ) );
   }
-}
+};
 
 const deleteAll = ( request, response ) => {
-  const filter = {};
-  const options = {};
-
-  db.leagues().deleteMany( filter, options )
+  LeagueService.deleteAll()
     .then( result => response.status( 200 ).json( result ) ) // result: { "n": 3, "ok": 1 }
     .catch( error => errors.responseHandler( response, error.stack, `failed to delete leagues: ${error.message}` ) );
-}
+};
 
 const deleteById = ( request, response ) => {
   const leagueId = request.params.id;
 
-  const filter = { _id: leagueId };
-  const options = {};
-
-  db.leagues().deleteOne( filter, options )
+  LeagueService.deleteById( leagueId )
     .then( result => response.status( 200 ).json( result ) ) // result: { "n": 1, "ok": 1 }
     .catch( error => errors.responseHandler( response, error.stack, `failed to delete league [ ${leagueId} ]: ${error.message}` ) );
-}
+};
+
+const newDraft = ( request, response ) => {
+  const leagueId = request.params.id;
+
+  LeagueService.newDraft( leagueId )
+    .then( result => response.status( 200 ).json( result ) )
+    .catch( error => errors.responseHandler( response, error.stack, `failed to start new draft board [ ${leagueId} ]: ${error.message}` ) );
+};
+
+const newDraftNomination = ( request, response ) => {
+  const leagueId = request.params.leagueId;
+  const playerId = request.params.playerId;
+
+  LeagueService.newDraftNomination( leagueId, playerId )
+    .then( result => response.status( 200 ).json( result ) )
+    .catch( error => errors.responseHandler( response, error.stack, `failed to nominate player [ ${playerId} ] for draft [ ${leagueId} ]: ${error.message}` ) );
+};
+
+const newDraftSelection = ( request, response ) => {
+  const leagueId = request.params.leagueId;
+  const playerId = request.params.playerId;
+  const nomination = request.body;
+  const teamManager = request.params.teamManager; // TODO: how to do query params
+  const winningBid = request.params.winningBid;
+
+  LeagueService.newDraftSelection( leagueId, playerId )
+    .then( result => response.status( 200 ).json( result ) )
+    .catch( error => errors.responseHandler( response, error.stack, `failed to select player [ ${playerId} ] for draft [ ${leagueId} ]: ${error.message}` ) );
+};
 
 module.exports = {
   findAll: findAll,
   findById: findById,
-  put: put,
+  upsert: upsert,
   deleteAll: deleteAll,
-  deleteById: deleteById
+  deleteById: deleteById,
+  newDraft: newDraft,
+  newDraftNomination: newDraftNomination,
+  newDraftSelection: newDraftSelection
 };

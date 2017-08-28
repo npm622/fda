@@ -1,0 +1,24 @@
+{
+  "_id": "ffc_2017",
+  "teams": [
+    { "manager": "Bmac", "name": "Brian's Unreal Team" },
+    { "manager": "Voucas", "name": "Coach Klein" },
+    { "manager": "Kollar", "name": "Dez Nutt$ 4 Prez" },
+    { "manager": "Adam", "name": "Division Champs" },
+    { "manager": "Yurk", "name": "Injured Easley" },
+    { "manager": "Eric", "name": "Jefe" },
+    { "manager": "Brendan", "name": "Jim Bob Cooters Men" },
+    { "manager": "Mark", "name": "Mark" },
+    { "manager": "Rich", "name": "McAdoo's Hairdo" },
+    { "manager": "Robbie", "name": "Peanutbutter Gumball" },
+    { "manager": "Dan", "name": "Show me your TDs" },
+    { "manager": "Rob", "name": "Terrible Towelies" },
+    { "manager": "Banten", "name": "The Sharknados" },
+    { "manager": "Nick", "name": "Thuney Or Not Thuney" }
+  ],
+  "draftConfig": {
+    "type": "auction",
+    "teamBudget": 200
+  },
+  "rosterSlots": [ "QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DST", "BN", "BN", "BN", "BN", "BN", "BN" ]
+}

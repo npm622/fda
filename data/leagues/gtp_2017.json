@@ -1,0 +1,21 @@
+{
+  "_id": "gtp_2017",
+  "teams": [
+    { "manager": "Vincent Termini", "name": "William Penny Jenner" },
+    { "manager": "Nick Makes", "name": "Malcolm in the Mitchell" },
+    { "manager": "Andrew Patterson", "name": "Cooley And The Gang" },
+    { "manager": "Gaetano Termini", "name": "It's Miller Time" },
+    { "manager": "Yale Shih", "name": "Mr. Rodger's Shady Hood" },
+    { "manager": "Nyle Hammond", "name": "Finkle is Einhorn" },
+    { "manager": "Chris Lamont", "name": "Some guys like old balls" },
+    { "manager": "William Penn", "name": "I'll show my Ditka" },
+    { "manager": "Kyle Marcotte", "name": "RIP Alex Rodriguez" },
+    { "manager": "Devanand Singh", "name": "Turn Down For Watt" }
+  ],
+  "draftConfig": {
+    "type": "auction",
+    "teamBudget": 200,
+    "selectionOrder": [ "" ]
+  },
+  "rosterSlots": [ "QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DST", "BN", "BN", "BN", "BN", "BN", "IR" ]
+}

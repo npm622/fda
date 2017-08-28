@@ -1,0 +1,23 @@
+{
+  "_id": "ia_2017",
+  "teams": [
+    { "manager": "Carly", "name": "Carly's Team" },
+    { "manager": "Christopher", "name": "Christopher's Team" },
+    { "manager": "Deanne", "name": "d tocks smack" },
+    { "manager": "Evan", "name": "Ezaki-el Elliott" },
+    { "manager": "Garrett", "name": "Garrett's Team" },
+    { "manager": "Nathan", "name": "Nathan's Nice Team" },
+    { "manager": "Omar", "name": "Omar's Team" },
+    { "manager": "Robotz", "name": "Patrick" },
+    { "manager": "Ross", "name": "select GRONKOW_SK" },
+    { "manager": "Danielle", "name": "St. Louis Rams" },
+    { "manager": "Ern", "name": "The Nassasins" },
+    { "manager": "Tombs", "name": "Tombs's Team" }
+  ],
+  "draftConfig": {
+    "type": "auction",
+    "teamBudget": 200,
+    "selectionOrder": [ "" ]
+  },
+  "rosterSlots": [ "QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DST", "BN", "BN", "BN", "BN", "BN", "IR" ]
+}
