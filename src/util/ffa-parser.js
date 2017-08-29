@@ -3,7 +3,6 @@ import csv from 'csvtojson';
 const stringFields = [ '_id', 'name', 'team', 'pos' ];
 
 const numerify = ( o ) => {
-  // console.log( "numerifying " + JSON.stringify( o ) );
   Object.keys( o )
     .filter( p => o.hasOwnProperty( p ) )
     .forEach( p => {
@@ -13,6 +12,9 @@ const numerify = ( o ) => {
         // do nothing
       } else {
         o[ p ] = +o[ p ];
+        if (!o[p]) {
+          delete o[p];
+        }
       }
     } );
 }

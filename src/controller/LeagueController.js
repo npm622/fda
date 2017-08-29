@@ -48,8 +48,9 @@ const deleteById = ( request, response ) => {
 
 const newDraft = ( request, response ) => {
   const leagueId = request.params.id;
+  const draftOrder = request.body;
 
-  LeagueService.newDraft( leagueId )
+  LeagueService.newDraft( leagueId, draftOrder )
     .then( result => response.status( 200 ).json( result ) )
     .catch( error => errors.responseHandler( response, error.stack, `failed to start new draft board [ ${leagueId} ]: ${error.message}` ) );
 };

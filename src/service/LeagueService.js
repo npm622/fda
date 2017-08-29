@@ -29,11 +29,20 @@ const deleteById = ( leagueId ) => {
     .deleteOne( { _id: leagueId } );
 }
 
-const newDraft = ( leagueId ) => {
-  const updateOperations = { $set: { draftBoard: { pick: 1, selections: [] } } };
+const newDraft = ( leagueId, draftOrder ) => {
+  return findById( leagueId )
+    .then( league => {
+      if ( draftOrder ) {
+        league.draftConfig.selectionOrder = draftOrder;
+      }
 
-  return db.leagues()
-    .updateOne( { _id: leagueId }, updateOperations )
+      league.teams.forEach( team => delete team.players );
+
+      league.draftBoard = { pick: 1, selections: [] };
+
+      return db.leagues()
+        .updateOne( { _id: leagueId }, league );
+    } );
 }
 
 // FIXME: this is unused/not useful yet
@@ -50,7 +59,14 @@ const newDraftNomination = ( leagueId, playerId ) => {
           name: player.name,
           team: player.team,
           pos: player.pos,
-          bye: player.bye
+          bye: player.bye,
+          player: {
+            id: player._id,
+            name: player.name,
+            team: player.team,
+            pos: player.pos,
+            bye: player.bye
+          }
         }
       }
     } );
@@ -67,10 +83,18 @@ const newDraftSelection = ( leagueId, playerId, teamManager, winningBid ) => {
         team.players = [];
       }
 
-      const nomination = {
+      let nominatingTeam = "unknown";
+      if (league.draftConfig.selectionOrder) {
+        nominatingTeam = league.draftConfig.selectionOrder[(league.draftBoard.pick % league.teams.length) - 1];
+      }
+
+      const selection = {
         pick: league.draftBoard.pick,
+        actors: {
+          nominator: nominatingTeam,
+          winner: team.manager,
+        },
         price: winningBid,
-        team: team.name,
         player: {
           id: player._id,
           name: player.name,
@@ -80,21 +104,10 @@ const newDraftSelection = ( leagueId, playerId, teamManager, winningBid ) => {
         }
       }
 
-      team.players.push( { price: winningBid, ...player } );
+      team.players.push( { price: selection.price, ...player } );
 
       league.draftBoard.pick++;
-      league.draftBoard.selections.push( {
-        pick: league.draftBoard.pick,
-        price: winningBid,
-        team: team.name,
-        player: {
-          id: player._id,
-          name: player.name,
-          team: player.team,
-          pos: player.pos,
-          bye: player.bye
-        }
-      } );
+      league.draftBoard.selections.push( selection );
 
       return upsert( league );
     } );

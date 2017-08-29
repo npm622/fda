@@ -1,27 +1,25 @@
 {
-  "name": "fantasy-draft-assistant",
-  "version": "0.0.0",
-  "license": "MIT",
-  "scripts": {
-    "start": "babel-node src/server --presets es2015,stage-2",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Nick Makes",
+  "name": "fda",
+  "version": "0.1.0",
   "private": true,
   "dependencies": {
+    "react": "^15.6.1",
+    "react-dom": "^15.6.1",
+    "react-scripts": "1.0.12",
     "bluebird": "3.5.0",
     "body-parser": "1.17.2",
     "commander": "2.11.0",
+    "create-react-app": "^1.4.0",
     "csvtojson": "1.1.7",
     "express": "4.15.4",
     "inquirer": "3.2.0",
     "js-yaml": "3.9.1",
     "mongodb": "2.2.30"
   },
-  "devDependencies": {
-    "babel-cli": "^6.26.0",
-    "babel-preset-es2015": "^6.24.1",
-    "babel-preset-stage-2": "^6.24.1",
-    "typescript": "2.2.0"
+  "scripts": {
+    "start": "react-scripts start",
+    "build": "react-scripts build",
+    "test": "react-scripts test --env=jsdom",
+    "eject": "react-scripts eject"
   }
 }
