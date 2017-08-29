@@ -36,6 +36,7 @@ const newDraft = ( leagueId ) => {
     .updateOne( { _id: leagueId }, updateOperations )
 }
 
+// FIXME: this is unused/not useful yet
 const newDraftNomination = ( leagueId, playerId ) => {
   return Promise.all( [ findById( leagueId ), PlayerService.findById( playerId ) ] )
     .then( results => {
@@ -55,22 +56,45 @@ const newDraftNomination = ( leagueId, playerId ) => {
     } );
 };
 
-const newDraftSelection = ( leagueId, nomination, teamManager, winningBid ) => {
-  return findById( leagueId )
-    .then( league => {
-      const team = league.teams.filter( t => t.manager === teamManager )[ 0 ];
+const newDraftSelection = ( leagueId, playerId, teamManager, winningBid ) => {
+  return Promise.all( [ findById( leagueId ), PlayerService.findById( playerId ) ] )
+    .then( results => {
+      const [ league, player ] = results;
 
-      nomination.bid = {
-        team: team.name, // TODO: this requires pulling the league and finding the team by manager first
-        price: winningBid
-      };
+      const team = league.teams.filter( t => t.manager === teamManager )[ 0 ];
 
       if ( !team.players ) {
         team.players = [];
       }
-      team.players.push( nomination.player );
 
-      league.draftBoard.selections.push( nomination );
+      const nomination = {
+        pick: league.draftBoard.pick,
+        price: winningBid,
+        team: team.name,
+        player: {
+          id: player._id,
+          name: player.name,
+          team: player.team,
+          pos: player.pos,
+          bye: player.bye
+        }
+      }
+
+      team.players.push( { price: winningBid, ...player } );
+
+      league.draftBoard.pick++;
+      league.draftBoard.selections.push( {
+        pick: league.draftBoard.pick,
+        price: winningBid,
+        team: team.name,
+        player: {
+          id: player._id,
+          name: player.name,
+          team: player.team,
+          pos: player.pos,
+          bye: player.bye
+        }
+      } );
 
       return upsert( league );
     } );
@@ -83,5 +107,6 @@ module.exports = {
   deleteAll: deleteAll,
   deleteById: deleteById,
   newDraft: newDraft,
-  newDraftNomination: newDraftNomination
+  newDraftNomination: newDraftNomination,
+  newDraftSelection: newDraftSelection
 };

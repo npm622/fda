@@ -20,8 +20,9 @@ app.put( `${ROOT_CONTEXT_PATH}/leagues/:id`, LeagueController.upsert );
 app.delete( `${ROOT_CONTEXT_PATH}/leagues`, LeagueController.deleteAll );
 app.delete( `${ROOT_CONTEXT_PATH}/leagues/:id`, LeagueController.deleteById );
 app.post( `${ROOT_CONTEXT_PATH}/leagues/:id/draft-board`, LeagueController.newDraft );
-app.post( `${ROOT_CONTEXT_PATH}/leagues/:leagueId/draft-board/:playerId/nominate`, LeagueController.newDraftNomination );
 app.put( `${ROOT_CONTEXT_PATH}/leagues/:leagueId/draft-board/:playerId/select`, LeagueController.newDraftSelection )
+// FIXME: this is unused/not useful yet
+app.post( `${ROOT_CONTEXT_PATH}/leagues/:leagueId/draft-board/:playerId/nominate`, LeagueController.newDraftNomination );
 
 // player routes
 app.get( `${ROOT_CONTEXT_PATH}/players`, PlayerController.findAll );

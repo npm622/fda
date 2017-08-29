@@ -54,6 +54,7 @@ const newDraft = ( request, response ) => {
     .catch( error => errors.responseHandler( response, error.stack, `failed to start new draft board [ ${leagueId} ]: ${error.message}` ) );
 };
 
+// FIXME: this is unused/not useful yet
 const newDraftNomination = ( request, response ) => {
   const leagueId = request.params.leagueId;
   const playerId = request.params.playerId;
@@ -66,11 +67,10 @@ const newDraftNomination = ( request, response ) => {
 const newDraftSelection = ( request, response ) => {
   const leagueId = request.params.leagueId;
   const playerId = request.params.playerId;
-  const nomination = request.body;
-  const teamManager = request.params.teamManager; // TODO: how to do query params
-  const winningBid = request.params.winningBid;
+  const teamManager = request.query.teamManager;
+  const winningBid = request.query.winningBid;
 
-  LeagueService.newDraftSelection( leagueId, playerId )
+  LeagueService.newDraftSelection( leagueId, playerId, teamManager, winningBid )
     .then( result => response.status( 200 ).json( result ) )
     .catch( error => errors.responseHandler( response, error.stack, `failed to select player [ ${playerId} ] for draft [ ${leagueId} ]: ${error.message}` ) );
 };
