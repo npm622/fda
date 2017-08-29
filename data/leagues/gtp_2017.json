@@ -14,8 +14,7 @@
   ],
   "draftConfig": {
     "type": "auction",
-    "teamBudget": 200,
-    "selectionOrder": [ "" ]
+    "teamBudget": 200
   },
   "rosterSlots": [ "QB", "RB", "RB", "WR", "WR", "TE", "FLEX", "K", "DST", "BN", "BN", "BN", "BN", "BN", "IR" ]
 }
