@@ -1,5 +1,22 @@
 import csv from 'csvtojson';
 
+const stringFields = [ '_id', 'name', 'team', 'pos' ];
+
+const numerify = ( o ) => {
+  // console.log( "numerifying " + JSON.stringify( o ) );
+  Object.keys( o )
+    .filter( p => o.hasOwnProperty( p ) )
+    .forEach( p => {
+      if ( typeof o[ p ] == "object" ) {
+        numerify( o[ p ] );
+      } else if ( stringFields.includes( p ) ) {
+        // do nothing
+      } else {
+        o[ p ] = +o[ p ];
+      }
+    } );
+}
+
 const readPlayerData = () => {
   const playerMap = {};
 
@@ -30,14 +47,18 @@ const readPlayerData = () => {
             p.age = age;
             p.exp = exp;
             p.bye = bye;
-            p.overallRank = parseInt(overallRank);
+            p.overallRank = parseInt( overallRank );
             p.risk = risk;
             p.rankings = { ...rest };
           } )
           .on( 'done', e => {
-            resolve( Object.keys( playerMap )
+            const players = Object.keys( playerMap )
               .filter( id => playerMap.hasOwnProperty( id ) )
-              .map( id => playerMap[ id ] ) )
+              .map( id => playerMap[ id ] );
+
+            players.forEach( player => numerify( player ) );
+
+            resolve( players );
           } );
       } );
   } );
