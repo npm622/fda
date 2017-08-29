@@ -43,7 +43,7 @@ const open = () => {
 
 const close = () => {
   if ( state.db ) {
-    db.close()
+    state.db.close()
       .then( closeSuccess )
       .catch( closeFailure );
   } else {
