@@ -4,26 +4,26 @@ import PlayerList from './PlayerList';
 import PlayerSelector from './PlayerSelector';
 import TeamPanels from './TeamPanels';
 
-const players = [
-  { _id: 1, rank: 1, name: 'David Johnson', bye: 8 },
-  { _id: 2, rank: 2, name: 'Leveon Bell', bye: 9 },
-  { _id: 3, rank: 3, name: 'Tom Brady', bye: 10 }
-];
-
 class DraftBoard extends Component {
 
   constructor(props) {
     super(props);
 
-    this.state = { players: players };
+    this.state = {  };
 
     this.playerSelected = this.playerSelected.bind(this);
   }
 
-  playerSelected(playerName) {
+  componentDidMount() {
+    fetch('/players')
+      .then(res => res.json())
+      .then(players => this.setState({players}));
+  }
+
+  playerSelected(selection) {
     const players = this.state.players.slice();
     players
-      .filter(p => p.name === playerName)
+      .filter(p => p._id === selection.playerId)
       .forEach(p => p.drafted = true);
 
     this.setState({
@@ -32,13 +32,18 @@ class DraftBoard extends Component {
   }
 
   render() {
+    const { league } = this.props;
+    const { players } = this.state;
+
     return (
       <div className="DraftBoard">
-        <h4>Draft Board: {this.props.leagueId}</h4>
-        <br/>
-        <PlayerSelector playerSelected={this.playerSelected} />
-        <PlayerList players={this.state.players} />
-        <TeamPanels />
+        <div className="DraftBoard-Left">
+          <PlayerSelector league={league} players={players} playerSelected={this.playerSelected} />
+          <PlayerList players={players} />
+        </div>
+        <div className="DraftBoard-Right">
+          <TeamPanels />
+        </div>
       </div>
     );
   }

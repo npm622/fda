@@ -19,7 +19,7 @@ class TeamPanels extends Component {
       <div>
         {this.state.teams.map( ( t, i ) => {
             return (
-              <div>
+              <div key={t.manager}>
                 <p> manager: {t.manager}</p>
                 <p> name: {t.name}</p>
               </div>

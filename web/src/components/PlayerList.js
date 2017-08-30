@@ -10,22 +10,37 @@ class PlayerList extends Component {
       showDrafted: false,
       playerFilter: 'ALL'
     }
+    this.toggleShowDrafted = this.toggleShowDrafted.bind(this);
+  }
+
+  toggleShowDrafted( event ) {
+    this.setState({showDrafted: !this.state.showDrafted})
   }
 
   render() {
+    const {showDrafted} = this.state;
+
+    const renderablePlayers = this.props.players.filter(player => this.state.showDrafted || !player.drafted);
+
     return (
-      <ul className="PlayerList">
-        {this.props.players
-          .filter( ( o ) => {
-            return !this.state.showDrafted && !o.drafted
-          })
-          .map( ( o, i ) => {
-            return (
-              <Player key={o.name} {...o} />
-            );
-          })
-        }
-      </ul>
+      <div className="PlayerList">
+        <label>Show drafted: <input type="checkbox" value="showDrafted" checked={showDrafted} onChange={this.toggleShowDrafted} /></label>
+        <p>{renderablePlayers.length} players</p>
+        <table>
+          <thead>
+            <tr>
+              <th>rank</th>
+              <th>name</th>
+              <th>bye</th>
+            </tr>
+          </thead>
+          <tbody>
+            {renderablePlayers.map( ( o ) =>
+                <Player key={o._id} {...o} />
+            )}
+          </tbody>
+        </table>
+      </div>
     );
   }
 }

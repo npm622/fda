@@ -1,9 +1,13 @@
-import React, { Component } from 'react';
+import React from 'react';
 import './Player.css';
 
-const Player = ({rank, name, bye}) => {
+const Player = ({overallRank, name, bye}) => {
   return (
-    <li className="Player">{rank}: {name} ( bye: {bye} )</li>
+    <tr>
+      <td>{overallRank}</td>
+      <td>{name}</td>
+      <td>{bye}</td>
+    </tr>
   );
 }
 

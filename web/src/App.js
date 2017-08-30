@@ -1,13 +1,32 @@
-import React from 'react';
+import React, {Component} from 'react';
 import './App.css';
-import { LandingPage, DraftBoard } from './components';
+import {DraftBoard} from './components';
 
-const App = () => {
+class App extends Component {
+  state = {
+    leagues: []
+  }
+
+  componentDidMount() {
+    fetch( '/leagues' )
+      .then(res => res.json())
+      .then(leagues => this.setState({leagues}));
+  }
+
+  render() {
+    const {leagues} = this.state;
+
     return (
       <div className="App">
-        <DraftBoard leagueId="ffc_2017"/>
+        {leagues
+          .filter( league => league._id === 'ffc_2017' )
+          .map( league => (
+            <DraftBoard key={league._id} league={league} />
+          ) )
+        }
       </div>
     );
-};
+  }
+}
 
 export default App;
