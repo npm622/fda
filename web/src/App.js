@@ -1,29 +1,25 @@
-import React, {Component} from 'react';
+import React, { Component } from 'react';
+import { Link } from 'react-router-dom';
+import logo from './logo.svg';
 import './App.css';
-import {DraftBoard} from './components';
 
 class App extends Component {
-  state = {
-    leagues: []
-  }
-
-  componentDidMount() {
-    fetch( '/leagues' )
-      .then(res => res.json())
-      .then(leagues => this.setState({leagues}));
-  }
-
   render() {
-    const {leagues} = this.state;
-
     return (
       <div className="App">
-        {leagues
-          .filter( league => league._id === 'ffc_2017' )
-          .map( league => (
-            <DraftBoard key={league._id} league={league} />
-          ) )
-        }
+        <div className="App-header">
+          <img src={logo} className="App-logo" alt="logo" />
+          <h2>Welcome to React</h2>
+        </div>
+        <p className="App-intro">
+          To get started, edit <code>src/App.js</code> and save to reload.
+
+          <p><Link to="/">Root</Link></p>
+          <p><Link to="/home">Home</Link></p>
+          <p><Link to="/sandbox">Sandbox</Link></p>
+          <p><Link to="/notexist">Not Exist</Link></p>
+          {this.props.children}
+        </p>
       </div>
     );
   }

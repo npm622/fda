@@ -1,0 +1,23 @@
+.Navbar {
+  position: relative;
+  display: -webkit-flex;
+  display: flex;
+  padding: 20px;
+  border: 2px solid blue;
+  z-index: 10;
+  height: 100px;
+}
+
+.Navbar-logo {
+  animation: Sandbox-logo-spin infinite 20s linear;
+  height: 60px;
+}
+
+.Navbar ul {
+  list-style: none;
+}
+
+.Navbar li {
+  display: inline;
+  margin: 0 10px;
+}

@@ -1,8 +1,26 @@
 import React from 'react';
-import ReactDOM from 'react-dom';
+import { render } from 'react-dom';
+import { Provider } from 'react-redux';
+import { createBrowserHistory, createMemoryHistory } from 'history';
+
+import Router from './router';
+import Store from './store';
+
 import './index.css';
-import App from './App';
 import registerServiceWorker from './registerServiceWorker';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+const store = Store();
+
+const history = typeof window !== 'undefined' ?
+  createBrowserHistory() : createMemoryHistory();
+
+const renderApp = () =>
+  render(
+    <Provider store={store}>
+      <Router history={history} />
+    </Provider>,
+    document.getElementById('app') );
+
+renderApp();
+
 registerServiceWorker();

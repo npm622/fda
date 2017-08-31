@@ -1,4 +1,5 @@
-import LandingPage from './LandingPage';
-import DraftBoard from './DraftBoard';
+import { Navbar } from './Navbar';
+import { DraftBoard } from './DraftBoard';
+import { PlayerPool } from './PlayerPool';
 
-export { LandingPage, DraftBoard };
+export { Navbar, DraftBoard, PlayerPool };

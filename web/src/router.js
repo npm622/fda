@@ -1,14 +1,20 @@
 import React from 'react';
-import { BrowserRouter as Router, Route } from 'react-router-dom';
-import {LandingPage, DraftBoard} from './components';
+import { Router, Route, Switch } from 'react-router';
 
-const FdaRouter = () => {
-  <Router>
+import App from './App';
+import { Home, Sandbox, NotFound } from './pages';
+
+const Routes = ( { history } ) => (
+  <Router history={history}>
     <div>
-      <Route exact path="/" component={LandingPage}/>
-      <Route path="/leagues/:leagueId/draft-board" component={DraftBoard} />
+      <Switch>
+        <Route exact path="/" component={App} />
+        <Route path="/home" component={Home} />
+        <Route path="/sandbox" component={Sandbox} />
+        <Route component={NotFound} />
+      </Switch>
     </div>
   </Router>
-};
+);
 
-export default FdaRouter;
+export default Routes;
