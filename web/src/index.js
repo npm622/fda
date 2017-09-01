@@ -5,11 +5,15 @@ import { createBrowserHistory, createMemoryHistory } from 'history';
 
 import Router from './router';
 import Store from './store';
+import { fetchAllLeagues, fetchAllPlayers } from './actions';
 
 import './index.css';
 import registerServiceWorker from './registerServiceWorker';
 
 const store = Store();
+
+store.dispatch( fetchAllLeagues() );
+store.dispatch( fetchAllPlayers() );
 
 const history = typeof window !== 'undefined' ?
   createBrowserHistory() : createMemoryHistory();

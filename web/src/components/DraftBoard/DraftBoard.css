@@ -17,16 +17,16 @@
   padding: 1rem;
   -webkit-overflow-scrolling: touch;
   -ms-overflow-style: none;
+  border: 1px solid #dddddd
 }
 
 .DraftBoard-players::-webkit-scrollbar, .DraftBoard-teams::-webkit-scrollbar {
-  display: none;
+  display: none;;
 }
 
 .DraftBoard-players {
   width: 25%;
   min-width: 100px;
-  background: blue;
 }
 
 .DraftBoard-players ul {
@@ -41,7 +41,6 @@
   -webkit-flex: 1;
   flex: 1;
   text-align: center;
-  background: green;
 }
 
 .DraftBoard-team-panel {

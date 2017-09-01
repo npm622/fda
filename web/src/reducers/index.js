@@ -1,8 +1,9 @@
-import draftBoard from './draftBoard';
 import { combineReducers } from 'redux';
 
-const rootReducer = combineReducers({
-  draftBoard
-});
+import leagueReducer from './league';
+import playerReducer from './player';
 
-export default rootReducer;
+export default combineReducers( {
+  leagues: leagueReducer,
+  players: playerReducer
+} );
