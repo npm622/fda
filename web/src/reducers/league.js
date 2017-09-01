@@ -1,7 +1,7 @@
 import * as actions from '../actions/types';
 import initialState from './initial-state';
 
-export default ( state = initialState.leagues, payload ) => {
+export default ( state = initialState.league, payload ) => {
   const { type, league, leagues } = payload;
 
   switch ( type ) {

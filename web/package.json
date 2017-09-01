@@ -21,6 +21,7 @@
     "react-scripts": "1.0.12",
     "react-select": "^1.0.0-rc.5",
     "redux": "3.7.2",
+    "redux-act": "^1.4.0",
     "redux-thunk": "2.2.0"
   }
 }

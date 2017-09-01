@@ -22,11 +22,11 @@ Sandbox.propTypes = {
 };
 
 const mapStateToProps = ( state, ownProps ) => {
-  const { leagues, players } = state;
+  const { league, players } = state;
 
-  let league;
-  leagues.filter( l => l._id === 'ffc_2017' ).forEach( l => league = l );
-  console.log(league);
+  // let league;
+  // leagues.filter( l => l._id === 'ffc_2017' ).forEach( l => league = l );
+  // console.log(league);
 
   return { league, players };
 };
